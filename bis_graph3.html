@@ -754,7 +754,49 @@
 </g></svg>
 
   <script>
-    var groupedPaths = d3.nest().key(function(d){return d3.select(d).style("fill")}).map(d3.selectAll("path")[0].map(function(d){return d}));
+    //find the paths that represent the rect in the legend
+    //get text from next node which has the label
+    var groups = d3.selectAll("path")[0].filter(function(d){
+          return Math.round(d.getBoundingClientRect().width) == 15 || Math.round(d.getBoundingClientRect().width) == 16})
+          
+    var colorMap = {};        
+    
+    groups.forEach(function(grp,i){
+      //for some reason the + css selector does not work on 3 of 5
+      //have to select parent group and then select next text with + text
+      colorMap[d3.select(grp).style("fill")] = d3.select(
+        "#" + d3.select(d3.select(grp)[0][0].parentNode).attr("id") + "+ text tspan," +
+        "#" + d3.select(grp).attr("id") + " + text tspan"
+        ).text();
+    })
+
+    //get array of path objects grouped by colors
+    //determined from above legend colorMap
+    var groupedPaths = d3.nest()
+      .key(function(d){return colorMap[d3.select(d).style("fill")]})
+      .entries(d3.selectAll("path")[0]
+        .map(function(d){
+          d3.select(d).attr("class",(colorMap[d3.select(d).style("fill")]) ? colorMap[d3.select(d).style("fill")].split(" ")[0] : "undefined");
+          return d;
+        })
+      );
+      
+    //now that we have paths that correspond to groups/data
+    //we can add behaviors that might aid understanding
+    groupedPaths.forEach(function(grpPath){
+      if (grpPath.key !== "undefined") {
+        // something simple we could do is add border
+        grpPath.values.forEach(function(d){
+          d3.select(d).on("mouseover", function(){
+            d3.selectAll("." + d3.select(this).attr("class") ).style("stroke","black")
+          })
+          d3.select(d).on("mouseout", function(){
+            d3.selectAll("." + d3.select(this).attr("class") ).style("stroke","none")
+          })
+        })
+      }
+    })
+    
   </script>
 </body>
 </html>
