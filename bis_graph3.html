@@ -790,11 +790,40 @@
         // something simple we could do is add border
         grpPath.values.forEach(function(d){
           d3.select(d).on("mouseover", function(){
+            var pathMoused = this;
             //start with something very simple like make stroke black
-            d3.selectAll("." + d3.select(this).attr("class") ).style("stroke","black")
+            d3.selectAll("." + d3.select(pathMoused).attr("class") ).style("stroke","black")
+            
+            //why not decrease opacity of others while we are at it
+            groupedPaths
+              .filter(function(grp){
+                if(!(grp.key == "undefined")){ 
+                  return grp.key.split(" ")[0] ? grp.key.split(" ")[0] !== d3.select(pathMoused).attr("class") : false
+                } else return false
+              })
+              .forEach(function(grp){
+                grp.values.forEach(function(drawing){
+                  if (+d3.select(drawing).attr('id').split('path')[1] > 3545) {
+                    d3.select(drawing).style("opacity",0.2)
+                  }
+                })
+              })
           })
           d3.select(d).on("mouseout", function(){
-            d3.selectAll("." + d3.select(this).attr("class") ).style("stroke","none")
+            var pathMoused = this;
+            d3.selectAll("." + d3.select(pathMoused).attr("class") ).style("stroke","none")
+            
+            groupedPaths
+              .filter(function(grp){
+                if(!(grp.key == "undefined")){ 
+                  return grp.key.split(" ")[0] ? grp.key.split(" ")[0] !== d3.select(pathMoused).attr("class") : false
+                } else return false
+              })
+              .forEach(function(grp){
+                grp.values.forEach(function(drawing){
+                  d3.select(drawing).style("opacity",1)
+                })
+              })
           })
         })
       }
