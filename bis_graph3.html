@@ -803,6 +803,9 @@
               })
               .forEach(function(grp){
                 grp.values.forEach(function(drawing){
+                  //unfortunately the stacked bars are not really stacked
+                  //but rather all the bars extend to the x axis/origin
+                  //hack this to not change the opacity of those
                   if (+d3.select(drawing).attr('id').split('path')[1] > 3545) {
                     d3.select(drawing).style("opacity",0.2)
                   }
