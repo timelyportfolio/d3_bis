@@ -764,12 +764,13 @@
     groups.forEach(function(grp,i){
       //for some reason the + css selector does not work on 3 of 5
       //have to select parent group and then select next text with + text
+        
       colorMap[d3.select(grp).style("fill")] = d3.select(
         "#" + d3.select(d3.select(grp)[0][0].parentNode).attr("id") + "+ text tspan," +
         "#" + d3.select(grp).attr("id") + " + text tspan"
         ).text();
     })
-
+    
     //get array of path objects grouped by colors
     //determined from above legend colorMap
     var groupedPaths = d3.nest()
@@ -777,6 +778,7 @@
       .entries(d3.selectAll("path")[0]
         .map(function(d){
           d3.select(d).attr("class",(colorMap[d3.select(d).style("fill")]) ? colorMap[d3.select(d).style("fill")].split(" ")[0] : "undefined");
+          d3.select(d).datum(colorMap[d3.select(d).style("fill")])
           return d;
         })
       );
@@ -788,6 +790,7 @@
         // something simple we could do is add border
         grpPath.values.forEach(function(d){
           d3.select(d).on("mouseover", function(){
+            //start with something very simple like make stroke black
             d3.selectAll("." + d3.select(this).attr("class") ).style("stroke","black")
           })
           d3.select(d).on("mouseout", function(){
@@ -796,6 +799,11 @@
         })
       }
     })
+    
+    //disable text pointer events so does not interfere
+    //with path mouseover and mouseout
+    d3.selectAll("text").style("pointer-events","none")
+    
     
   </script>
 </body>
